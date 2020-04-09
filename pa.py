@@ -108,14 +108,7 @@ class PARegressor(BasePA, base.Regressor):
 
             tau_y = self.calc_tau(X, self.loss.eval(y, y_pred))
             step_y = tau_y * np.sign(y - y_pred)
-        
-            # x_pred, y_pred = self.predict_one(X)
-            # loss_x = self.loss.eval(x, x_pred)
-            # loss_y = self.loss.eval(y, y_pred)
-            # sign_x = np.sign(x - x_pred)
-            # sign_y = np.sign(y - y_pred)
-        
-
+       
             for i, xi in X.items():
                 self.weights_x[i] += step_x * xi
                 self.weights_y[i] += step_y * xi
