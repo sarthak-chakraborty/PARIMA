@@ -15,12 +15,20 @@ import pickle
 dataset = int(sys.argv[1])
 topic = sys.argv[2]
 fps=int(sys.argv[3])
+<<<<<<< HEAD
 offset = int(sys.argv[4])
 pref_quality = sys.argv[5]
+=======
+pref_quality = sys.argv[4]
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 
 usernum=1
 ncol_tiles=8
 nrow_tiles=8
+<<<<<<< HEAD
+=======
+pred_nframe=1
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 bitrates = {'360p':1, '480p':2.5, '720p':5, '1080p':8, '1440p':16}	# [360p, 480p, 720p, 1080p, 1440p]
 
 pref_bitrate = bitrates[pref_quality]
@@ -32,6 +40,7 @@ pref_bitrate = bitrates[pref_quality]
 # view_height = 720
 # milisec = 1000.0
 
+<<<<<<< HEAD
 # ds 1
 width=3840.0
 height=1920.0
@@ -46,6 +55,22 @@ milisec = 1.0
 # view_height = 1440.0
 # milisec = 1.0
 
+=======
+# # ds 1
+# width=3840.0
+# height=1920.0
+# view_width = 3840.0
+# view_height = 2048.0
+# milisec = 1.0
+
+# ds 2
+width=2560.0
+height=1280.0
+view_width = 2560.0
+view_height = 1440.0
+milisec = 1.0
+
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 
 def get_data(data, frame_nos, dataset, topic, usernum):
 
@@ -56,7 +81,10 @@ def get_data(data, frame_nos, dataset, topic, usernum):
 	obj_info = np.load('Obj_traj/ds{}/ds{}_topic{}.npy'.format(dataset, dataset, topic), allow_pickle=True,  encoding='latin1').item()
 	view_info = pickle.load(open('Viewport/ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 	n_objects = []
 	for i in obj_info.keys():
 		try:
@@ -69,8 +97,11 @@ def get_data(data, frame_nos, dataset, topic, usernum):
 
 	for i in range(len(view_info)-1):
 		frame = int(view_info[i][0]*1.0*fps/milisec)
+<<<<<<< HEAD
 		frame += int(offset*1.0*fps/milisec)
 
+=======
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 		frame_nos.append(frame)
 		if(frame > max_frame):
 			break
@@ -99,18 +130,32 @@ def get_data(data, frame_nos, dataset, topic, usernum):
 
 
 
+<<<<<<< HEAD
 def pred_frames(data, model, metric_X, metric_Y, frames, tile_manhattan_error, act_tiles, pred_tiles, count):
 	x_pred, y_pred = 0,0
 	# count = 0
+=======
+def pred_frames(data, model, metric_X, metric_Y, frames, tile_manhattan_error, act_tiles, pred_tiles):
+	x_pred, y_pred = 0,0
+	count = 0
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 
 	for k in range(len(frames)):
 		[inp_k, x_act, y_act] = data[frames[k]]
 		if(k == 0):
+<<<<<<< HEAD
 			x_pred, y_pred = model.predict_one(inp_k, True, x_act, y_act)
 		else:
 			inp_k['VIEWPORT_x'] = x_pred
 			inp_k['VIEWPORT_y'] = y_pred
 			x_pred, y_pred = model.predict_one(inp_k, True, None, None)	
+=======
+			x_pred, y_pred = model.predict_one(inp_k)
+		else:
+			inp_k['VIEWPORT_x'] = x_pred
+			inp_k['VIEWPORT_y'] = y_pred
+			x_pred, y_pred = model.predict_one(inp_k)	
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 
 		metric_X = metric_X.update(x_act, x_pred)
 		metric_Y = metric_Y.update(y_act, y_pred)
@@ -124,7 +169,11 @@ def pred_frames(data, model, metric_X, metric_Y, frames, tile_manhattan_error, a
 		actual_tile_col = ncol_tiles-1 if(actual_tile_col >= ncol_tiles) else actual_tile_col
 
 
+<<<<<<< HEAD
 		#######################################################
+=======
+		####################################################
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 		print("x: "+str(x_act))
 		print("x_pred: "+str(x_pred))
 		print("y: "+str(y_act))	
@@ -145,14 +194,21 @@ def pred_frames(data, model, metric_X, metric_Y, frames, tile_manhattan_error, a
 
 
 def build_model(data, frame_nos, max_frame):
+<<<<<<< HEAD
 	model = linear_model.PARegressor(C=0.01, mode=2, eps=0.001, data=data, learning_rate=0.005, rho=0.99)
+=======
+	model = linear_model.PARegressor(C=0.01, mode=2, eps=0.1, data=data)
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 	metric_X = metrics.MAE()
 	metric_Y = metrics.MAE()
 	manhattan_error = []
 	x_mae = []
 	y_mae = []
+<<<<<<< HEAD
 	count = 0
 	pred_nframe=30
+=======
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 
 	i=0
 	tile_manhattan_error=0
@@ -169,7 +225,10 @@ def build_model(data, frame_nos, max_frame):
 		else:
 			break
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 	# Predicting frames and update model
 	while True:
 		curr_frame = frame_nos[i]
@@ -193,7 +252,12 @@ def build_model(data, frame_nos, max_frame):
 		frames = sorted(frames)
 		chunk_frames.append(frames)
 
+<<<<<<< HEAD
 		metric_X, metric_Y, tile_manhattan_error, count, act_tiles, pred_tiles = pred_frames(data, model, metric_X, metric_Y, frames, tile_manhattan_error, act_tiles, pred_tiles, count)
+=======
+		print(len(frames))
+		metric_X, metric_Y, tile_manhattan_error, count, act_tiles, pred_tiles = pred_frames(data, model, metric_X, metric_Y, frames, tile_manhattan_error, act_tiles, pred_tiles)
+>>>>>>> c9f2eb3adae31f7f5f8370897d120e5b1df1e009
 		model = model.fit_n(frames)
 
 		manhattan_error.append(tile_manhattan_error*1.0 / count)
