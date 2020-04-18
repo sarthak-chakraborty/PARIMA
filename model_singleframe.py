@@ -9,60 +9,104 @@ from creme import stream
 from sklearn import datasets
 import numpy as np 
 import math
+import sys
+import pickle
 
 
-def generate(data):
-	for i in data:
-		yield i
+dataset = int(sys.argv[1])
+topic = sys.argv[2]
+fps=int(sys.argv[3])
+offset = int(sys.argv[4])
 
-
-fps=30
 usernum=1
 ncol_tiles=8
 nrow_tiles=8
-obj_info = np.load('lovish_stitched_metadata-equirectangular-object-info.npy', allow_pickle=True, encoding='latin1')
-view_info = np.load('Viewport'+str(usernum)+'.npy', allow_pickle=True, encoding='latin1')
-data=[]
-frame_nos=[]
+frame_nos = []
+data = []
 
+# # OUR DATA
+# width=3840.0
+# height=1920.0
+# view_width = 1280
+# view_height = 720
+# milisec = 1000.0
+
+# ds 1
+width=3840.0
+height=1920.0
+view_width = 3840.0
+view_height = 2048.0
+milisec = 1.0
+
+
+
+# # FOR OWN DATA
+# obj_info = np.load('lovish_stitched_object_trajectory_converted.npy', allow_pickle=True).item()
+# view_info = np.load('Viewport'+str(usernum)+'.npy', allow_pickle=True, encoding='latin1')
+
+obj_info = np.load('Obj_traj/ds{}/ds{}_topic{}.npy'.format(dataset, dataset, topic), allow_pickle=True,  encoding='latin1').item()
+view_info = pickle.load(open('Viewport/ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
+
+
+n_objects = []
+for i in obj_info.keys():
+	try:
+		n_objects.append(max(obj_info[i].keys()))
+	except:
+		n_objects.append(0)
+total_objects=max(n_objects)
+max_frame = int(view_info[-1][0]*1.0*fps/milisec)
 
 for i in range(len(view_info)-1):
-	frame = int(view_info[i][0]*1.0*fps/1000)
+	frame = int(view_info[i][0]*1.0*fps/milisec)
+	frame += int(offset*1.0*fps/milisec)
+
 	frame_nos.append(frame)
-	if(frame >= 577):
+	if(frame > max_frame):
 		break
 	X={}
-	X['VIEWPORT_x']=int(view_info[i][1][0]*3840.0/1280)
-	X['VIEWPORT_y']=int(view_info[i][1][1]*1920.0/720)
-	for j in range(len(obj_info)):
-		if obj_info[j][frame] == None:
+	X['VIEWPORT_x']=int(view_info[i][1][0]*width/view_width)
+	X['VIEWPORT_y']=int(view_info[i][1][1]*height/view_height)
+	for j in range(total_objects):
+		try:
+			centroid = obj_info[frame][j]
+
+			if obj_info[frame][j] == None:
+				X['OBJ_'+str(j)+'_x']=np.random.normal(0,1)
+				X['OBJ_'+str(j)+'_y']=np.random.normal(0,1)
+			else:
+				X['OBJ_'+str(j)+'_x']=centroid[0]
+				X['OBJ_'+str(j)+'_y']=centroid[1]
+
+		except:
+			X['OBJ_'+str(j)+'_x']=np.random.normal(0,1)
+			X['OBJ_'+str(j)+'_y']=np.random.normal(0,1)
+
+
+	data.append((X, int(view_info[i+1][1][0]*width/view_width),int(view_info[i+1][1][1]*height/view_height)))
+
+test={}
+testframe = int(view_info[-1][0]*fps*1.0/milisec)
+testframe += int(offset*1.0*fps/milisec)
+frame_nos.append(testframe)
+if(testframe > max_frame):
+	testframe = max_frame-1
+test['VIEWPORT_x']=int(view_info[-1][1][0]*width/view_width)
+test['VIEWPORT_y']=int(view_info[-1][1][1]*height/view_height)
+for j in range(total_objects):
+	try:
+		centroid = obj_info[frame][j]
+
+		if obj_info[frame][j] == None:
 			X['OBJ_'+str(j)+'_x']=np.random.normal(0,1)
 			X['OBJ_'+str(j)+'_y']=np.random.normal(0,1)
 		else:
-			centroid_x = float(obj_info[j][frame][0]+obj_info[j][frame][2]+obj_info[j][frame][4]+obj_info[j][frame][6])/4
-			centroid_y = float(obj_info[j][frame][1]+obj_info[j][frame][3]+obj_info[j][frame][5]+obj_info[j][frame][7])/4
-			X['OBJ_'+str(j)+'_x']=centroid_x
-			X['OBJ_'+str(j)+'_y']=centroid_y
+			X['OBJ_'+str(j)+'_x']=centroid[0]
+			X['OBJ_'+str(j)+'_y']=centroid[1]
 
-	data.append((X, int(view_info[i+1][1][0]*3840.0/1280), int(view_info[i+1][1][1]*1920.0/720)))
-
-
-test={}
-frame = int(view_info[-1][0]*fps*1.0/1000)
-frame_nos.append(frame)
-if(frame >= 577):
-	frame = 576
-test['VIEWPORT_x']=int(view_info[-1][1][0]*3840.0/1280)
-test['VIEWPORT_y']=int(view_info[-1][1][1]*1920.0/720)
-for j in range(len(obj_info)):
-	if obj_info[j][frame] == None:
-		test['OBJ_'+str(j)+'_x']=np.random.normal(0,1)
-		test['OBJ_'+str(j)+'_y']=np.random.normal(0,1)
-	else:
-		centroid_x = float(obj_info[j][frame][0]+obj_info[j][frame][2]+obj_info[j][frame][4]+obj_info[j][frame][6])/4
-		centroid_y = float(obj_info[j][frame][1]+obj_info[j][frame][3]+obj_info[j][frame][5]+obj_info[j][frame][7])/4
-		test['OBJ_'+str(j)+'_x']=centroid_x
-		test['OBJ_'+str(j)+'_y']=centroid_y
+	except:
+		X['OBJ_'+str(j)+'_x']=np.random.normal(0,1)
+		X['OBJ_'+str(j)+'_y']=np.random.normal(0,1)
 
 
 
@@ -78,7 +122,7 @@ i=0
 tile_manhattan_error=0
 
 for inp,x,y in data:
-	x_pred, y_pred = model.predict_one(inp)
+	x_pred, y_pred = model.predict_one(inp, False, None, None)
 
 	metric_X = metric_X.update(x, x_pred)
 	metric_Y = metric_Y.update(y, y_pred)
