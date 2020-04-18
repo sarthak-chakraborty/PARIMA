@@ -11,6 +11,7 @@ from statsmodels.tsa.arima_model import ARIMA
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.statespace.varmax import VARMAX
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 import matplotlib.pyplot as plt
 import numpy as np
 from statsmodels.tsa.stattools import acf, pacf
@@ -208,28 +209,48 @@ series_new = []
 for i in range(len(series_x)):
 	series_new.append([series_x[i], series_y[i]])
 
-model = VARMAX(series_new, order=(4,0), trend='ct')
-model_fit = model.fit(maxiter=1000, disp=0)
-# print(model_fit.summary())
 
-z = model_fit.forecast(30)
+model_x = SARIMAX(series_x, order=(1,1,0))
+model_fit_x = model_x.fit(maxiter=1000, disp=0)
+model_pred_x = model_fit_x.forecast(30)
+
+model_y = ARIMA(series_y, order=(5,0,0))
+model_fit_y = model_y.fit(maxiter=1000, disp=0)
+model_pred_y = model_fit_y.forecast(30)[0]
+
+print(model_pred_x)
+
+# model = VARMAX(series_new, order=(4,0), trend='ct')
+# model_fit = model.fit(maxiter=1000, disp=0)
+# z = model_fit.forecast(30)
 
 
 act_x, act_y = series[b-1:b+30, 0], series[b-1:b+30, 1]
-x_pred = []
-for i in range(len(z)):
-	if i == 0:
-		x_pred.append(np.exp(z[i, 0]) * act_x[i])
-	else:
-		x_pred.append(np.exp(z[i, 0]) * x_pred[i-1])
-	print(act_x[i+1], x_pred[i])
+# x_pred = []
+# for i in range(len(z)):
+# 	if i == 0:
+# 		x_pred.append(np.exp(z[i, 0]) * act_x[i])
+# 	else:
+# 		x_pred.append(np.exp(z[i, 0]) * x_pred[i-1])
+# 	print(act_x[i+1], x_pred[i])
 
 
-print("###")
-y_pred = []
-for i in range(len(z)):
-	if i == 0:
-		y_pred.append(np.exp(z[i, 1]) * act_y[i])
+# print("###")
+# y_pred = []
+# for i in range(len(z)):
+# 	if i == 0:
+# 		y_pred.append(np.exp(z[i, 1]) * act_y[i])
+# 	else:
+# 		y_pred.append(np.exp(z[i, 1]) * y_pred[i-1])
+# 	print(act_y[i+1], y_pred[i])
+
+
+
+x_pred_list, y_pred_list = [], []
+for k in range(len(model_pred_x)):
+	if k == 0:
+		x_pred_list.append(np.exp(model_pred_x[k]) * act_x[i])
+		y_pred_list.append(np.exp(model_pred_y[k]) * act_y[i])
 	else:
-		y_pred.append(np.exp(z[i, 1]) * act_y[i])
-	print(act_y[i+1], y_pred[i])
+		x_pred_list.append(np.exp(model_pred_x[k]) * x_pred_list[k-1])
+		y_pred_list.append(np.exp(model_pred_y[k]) * y_pred_list[k-1])
