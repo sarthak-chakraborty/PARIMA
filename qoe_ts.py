@@ -125,12 +125,18 @@ def pred_frames(data, model, metric_X, metric_Y, frames, prev_frames, tile_manha
 	result = len(series[:, 0]) > 0 and all(elem == series[0][0] for elem in series[:, 0])
 	if(result):
 		series[:, 0] = [elem + random.random()/10 for elem in series[:, 0]]
+	for i in range(len(series[:, 0])):
+		if series[i, 0] == 0:
+			series[i, 0] += random.random()
 	series_log = np.log(series[:, 0])
 	series_x = np.diff(series_log, 1)
 
 	result = len(series[:, 1]) > 0 and all(elem == series[0][1] for elem in series[:, 1])
 	if(result):
 		series[:, 1] = [elem + random.random()/10 for elem in series[:, 1]]
+	for i in range(len(series[:, 1])):
+		if series[i, 1] == 0:
+			series[i, 1] += random.random()
 	series_log = np.log(series[:, 1])
 	series_y = np.diff(series_log, 1)
 
