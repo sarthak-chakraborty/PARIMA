@@ -1,0 +1,6 @@
+dirpath1 = u'./data/head-orientation/dataset1'
+dirpath2 = u'./data/head-orientation/dataset2/Experiment_1'
+dirpath3 = u'./data/head-orientation/dataset3/sensory/orientation'
+ext1 = '.txt'
+ext2 = '.csv'
+ext3 = '.csv'
