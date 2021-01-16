@@ -55,6 +55,10 @@ if `ds=1`, `video` can be `paris`, `roller`, `venise`, `diving`, `timelapse`
 if `ds=2`, `video` can be `0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`  
 if `ds=3`, `video` can be `coaster2_`, `coaster_`, `diving`, `drive`, `game`, `landscape`, `pacman`, `panel`, `ride`, `sport`  
 
+
+## Edit
+**`get_viewport.py` converts the head-tracking logs from quaternions to pixels on an equirectangular frame. Run this file with the above command line arguments to get viewport of all users for a particular video**
+
 # License
 This project is licensed under the terms of the MIT license.  
 

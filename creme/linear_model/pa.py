@@ -137,14 +137,6 @@ class PARegressor(BasePA, base.Regressor):
         return self
 
     def predict_one(self, x, use_momentum, x_act, y_act):
-        if(use_momentum):
-            x_pred = utils.math.dot(x, utils.math.subtract(self.weights_x, self.momentum_x)) + self.intercept_x
-            y_pred = utils.math.dot(x, utils.math.subtract(self.weights_y, self.momentum_y)) + self.intercept_y
-            # if x_act == None:
-            #     if self.x_act != None:
-            return x_pred, y_pred
-
-        else:
             return utils.math.dot(x, self.weights_x) + self.intercept_x, utils.math.dot(x, self.weights_y) + self.intercept_y
 
 
