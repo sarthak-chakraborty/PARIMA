@@ -18,9 +18,9 @@ With increasing advancements in technologies for capturing 360-degree videos, ad
 		
 		|
 		|__ Baseline/          --> Contains the implementions of the baseline algorithms that we tested PARIMA against
-		|	|
-		|	|__ Clust/
-		|	|__ NABA/
+		|   |
+		|   |__ Clust/
+		|   |__ NABA/
 		|   |__ PanoSalnet/
 		|
 		|__ creme/              --> Modifications that we made to the source code of the library to enable multi-frames prediction. In your system, go to the location(say, `L`) where `creme` package is stored(eg, `~/anaconda3/lib/python3.7/site-packages/creme/`) and copy the file `creme/linear_model/pa.py` into the appropriate subdirectory in `L` 
@@ -35,5 +35,15 @@ With increasing advancements in technologies for capturing 360-degree videos, ad
 ## Requirements
 
 Use `python3` for all the codes. Install the dependencies by running `pip install -r requirements.txt`. 
+
+
+## Datasets
+
+In our experiments, we have particularly used two popular datasets containing several 360-degree videos of different categories along with head tracking log. 
+
+1. Xavier Corbillon, Francesca De Simone, and Gwendal Simon. [2017]. *360-Degree Video Head Movement Dataset.* In Proceedings of the ACM MMSys 2017 
+It includes five videos freely viewed by 59 users each with each video watched for 70 seconds. The dataset is available from [http://dash.ipv6.enstb.fr/headMovements/](http://dash.ipv6.enstb.fr/headMovements/)
+2. Chenglei Wu, Zhihao Tan, Zhi Wang, and Shiqiang Yang. [2017]. *A Dataset for Exploring User Behaviors in VR Spherical Video Streaming.* In Proceedings of the ACM MMSys 2017 
+It has nine popular videos watched by 48 users with an average view duration of 164 seconds. The dataset is available from [https://wuchlei-thu.github.io/](https://wuchlei-thu.github.io/)
 
 
