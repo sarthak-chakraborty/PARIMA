@@ -17,7 +17,7 @@ With increasing advancements in technologies for capturing 360-degree videos, ad
 ## Folder Descriptions
 		
 		|
-		|__ Baseline/			--> Contains the implementions of the baseline algorithms that we tested PARIMA against
+		|__ Baseline/          --> Contains the implementions of the baseline algorithms that we tested PARIMA against
 		|	|
 		|	|__ Clust/
 		|	|__ NABA/
