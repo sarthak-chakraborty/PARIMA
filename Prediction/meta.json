@@ -1,0 +1,29 @@
+{
+	"dataset" : [
+		{
+			"nusers" : 58,
+			"width" : 3840.0,
+			"height" : 1920.0,
+			"view_width" : 3840.0,
+			"view_height" : 2048.0,
+			"milisec" : 1.0
+		},
+		{
+			"nusers" : 48,
+			"width" : 2560.0,
+			"height" : 1280.0,
+			"view_width" : 2560.0,
+			"view_height" : 1440.0,
+			"milisec" : 1.0
+		}
+	],
+	"bitrates" : {
+			"360p" : 1,
+			"480p" : 2.5,
+			"720p" : 5,
+			"1080p" : 8,
+			"1440p" : 16
+	},
+	"ncol_tiles" : 8,
+	"nrow_tiles" : 8
+}

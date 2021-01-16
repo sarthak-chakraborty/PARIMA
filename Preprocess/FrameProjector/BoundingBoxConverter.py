@@ -18,8 +18,8 @@ def main():
 	out.initImages(int(args.outWidth), int(args.outHeight))
 
 	source = vrProjector.EquirectangularProjection()
-	source.loadImage(args.dirPath+"/frame0.jpg")
-	out.reprojectToEquirectangular(args.sourceMetaFilePath,source)
+	source.loadImage(args.dirPath + "/frame0.jpg")
+	out.reprojectToEquirectangular(args.sourceMetaFilePath, source)
 
 if __name__ == "__main__":
     main()

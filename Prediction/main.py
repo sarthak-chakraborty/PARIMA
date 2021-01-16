@@ -6,41 +6,15 @@ import pickle
 import random
 import warnings
 import time
+import argparse
+import json
 from parima import build_model
 from bitrate import alloc_bitrate
 from qoe import calc_qoe
 
 
-dataset = int(sys.argv[1])
-topic = sys.argv[2]
-fps=int(sys.argv[3])
-offset=int(sys.argv[4])
-pref_quality = sys.argv[5]
 
-usernum=2
-ncol_tiles=8
-nrow_tiles=8
-pred_nframe=fps
-bitrates = {'360p':1, '480p':2.5, '720p':5, '1080p':8, '1440p':16}	# [360p, 480p, 720p, 1080p, 1440p]
-
-pref_bitrate = bitrates[pref_quality]
-
-# ds 1
-# width=3840.0
-# height=1920.0
-# view_width = 3840.0
-# view_height = 2048.0
-# milisec = 1.0
-
-# ds 2
-width=2560.0
-height=1280.0
-view_width = 2560.0
-view_height = 1440.0
-milisec = 1.0
-
-
-def get_data(data, frame_nos, dataset, topic, usernum):
+def get_data(data, frame_nos, dataset, topic, usernum, fps, milisec, width, height, view_width, view_height):
 
 	obj_info = np.load('../../Obj_traj/ds{}/ds{}_topic{}.npy'.format(dataset, dataset, topic), allow_pickle=True,  encoding='latin1').item()
 	view_info = pickle.load(open('../../Viewport/ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
@@ -136,25 +110,57 @@ def get_data(data, frame_nos, dataset, topic, usernum):
 
 
 def main():
+
+	parser = argparse.ArgumentParser(description='Run PARIMA algorithm and calculate video for a single user')
+
+	parser.add_argument('-D', '--dataset', type=int, required=True, help='Dataset ID (1 or 2)')
+	parser.add_argument('-T', '--topic', required=True, help='Topic in the particular Dataset (video name)')
+	parser.add_argument('--fps', type=int, required=True, help='fps of the video')
+	parser.add_argument('-O', '--offset', type=int, default=0, help='Offset for the video in seconds (when the data was logged in the dataset) [default: 0]')
+	parser.add_argument('-U', '--user', type=int, default=0, help='User ID on which the algorithm will be run [default: 0]')
+	parser.add_argument('-Q', '--quality', required=True, help='Preferred bitrate quality of the video (360p, 480p, 720p, 1080p, 1440p)')
+
+	args = parser.parse_args()
+
+
+	# Get the necessary information regarding the dimensions of the video
+	print("Reading JSON...")
+	file = open('./meta.json', )
+	jsonRead = json.load(file)
+
+	width = jsonRead["dataset"][args.dataset-1]["width"]
+	height = jsonRead["dataset"][args.dataset-1]["height"]
+	view_width = jsonRead["dataset"][args.dataset-1]["view_width"]
+	view_height = jsonRead["dataset"][args.dataset-1]["view_height"]
+	milisec = jsonRead["dataset"][args.dataset-1]["milisec"]
+
+	pref_bitrate = jsonRead["bitrates"][args.quality]
+	ncol_tiles = jsonRead["ncol_tiles"]
+	nrow_tiles = jsonRead["nrow_tiles"]
+	
+	# Initialize variables
+	pred_nframe = args.fps
 	data, frame_nos = [],[]
+
+	# Read Data
 	print("Reading Viewport Data and Object Trajectories...")
-	data, frame_nos, max_frame, tot_objects = get_data(data, frame_nos, dataset, topic, usernum)
+	data, frame_nos, max_frame, tot_objects = get_data(data, frame_nos, args.dataset, args.topic, args.user, args.fps, milisec, width, height, view_width, view_height)
 	print("Data read\n")
 	
 	print("Build Model...")
-	act_tiles, pred_tiles, chunk_frames, manhattan_error, x_mae, y_mae = build_model(data, frame_nos, max_frame, tot_objects, width, height, nrow_tiles, ncol_tiles, fps, pred_nframe)
+	act_tiles, pred_tiles, chunk_frames, manhattan_error, x_mae, y_mae = build_model(data, frame_nos, max_frame, tot_objects, width, height, nrow_tiles, ncol_tiles, args.fps, pred_nframe)
 
 	i = 0
 	while True:
 		curr_frame=frame_nos[i]
-		if curr_frame<5*fps:
+		if curr_frame < 5*args.fps:
 			i += 1
 		else:
 			break
 
 	frame_nos = frame_nos[i:]
 	print("Allocate Bitrates...")
-	vid_bitrate = alloc_bitrate(pred_tiles, frame_nos, chunk_frames, pref_quality, nrow_tiles, ncol_tiles, pref_bitrate)
+	vid_bitrate = alloc_bitrate(pred_tiles, frame_nos, chunk_frames, args.quality, nrow_tiles, ncol_tiles, pref_bitrate)
 	
 	print("Calculate QoE...")
 	qoe = calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames, width, height, nrow_tiles, ncol_tiles)
