@@ -52,3 +52,6 @@ It includes five videos freely viewed by 59 users each with each video watched f
 It has nine popular videos watched by 48 users with an average view duration of 164 seconds. The dataset is available from [https://wuchlei-thu.github.io/](https://wuchlei-thu.github.io/)
 
 
+## License
+
+The project is termed under the terms of MIT License
