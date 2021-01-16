@@ -30,6 +30,11 @@ With increasing advancements in technologies for capturing 360-degree videos, ad
 		|__ Prediction/         --> Contains the implementation of PARIMA
 		|
 		|__ Preprocess/         --> Codes to perform the one-time video preprocessing at the Server end. Check `PreProcess/README.md` for further details
+		|   |
+		|   |__ FrameProjector/
+		|   |__ YOLO/
+		|   |__ ObjectTrack/
+		|
 	
 
 ## Requirements

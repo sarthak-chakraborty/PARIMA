@@ -38,7 +38,7 @@ Run the following commands in sequence to generate Object tracking files
 
 - Run Object Tracking
 
-		cd Object_tracking
+		cd ObjectTrack
 		python tracker.py --sourceFile <sourceFileName> --dirPath <directory with frames> --outputnpy <outputfilename>
 		cd ..
 
