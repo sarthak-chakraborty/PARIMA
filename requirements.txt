@@ -1,0 +1,5 @@
+numpy==1.18.5
+pandas==1.1.4
+creme==0.4.4
+statsmodels==0.12.1
+stattools==0.0.4

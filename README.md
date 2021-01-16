@@ -1,8 +1,13 @@
+[![HitCount](http://hits.dwyl.com/sarthak-chakraborty/PARIMA.svg)](http://hits.dwyl.com/sarthak-chakraborty/PARIMA)
+
 # PARIMA: Viewport Adaptive 360-Degree Video Streaming
 
-This is the official repository corresponding to the paper titled "PARIMA: Viewport Adaptive 360-Degree Video Streaming"(link available soon) accepted at the Proeedings of the 30th Web Conference 2021 (WWW '21), Ljubljana, Slovenia.
+This is the official repository corresponding to the paper titled **"PARIMA: Viewport Adaptive 360-Degree Video Streaming"**(link available soon) accepted at the Proeedings of the 30th Web Conference 2021 (WWW '21), Ljubljana, Slovenia.
 
 ***Please cite our paper in any published work that uses any of these resources.***
+
+> Lovish Chopra, Sarthak Chakraborty, Abhijit Mondal, and Sandip Chakraborty. 2021. PARIMA: Viewport Adaptive 360-Degree Video Streaming. In *WWW '21: Proceedings of The Web Conference 2021*, April 19--23, 2021, Ljubljana
+
 
 ## Abstract
 
@@ -10,8 +15,25 @@ With increasing advancements in technologies for capturing 360-degree videos, ad
 
 
 ## Folder Descriptions
+		
+		|
+		|__ Baseline/			--> Contains the implementions of the baseline algorithms that we tested PARIMA against
+		|	|
+		|	|__ Clust/
+		|	|__ NABA/
+		|   |__ PanoSalnet/
+		|
+		|__ creme/              --> Modifications that we made to the source code of the library to enable multi-frames prediction. In your system, go to the location(say, `L`) where `creme` package is stored(eg, `~/anaconda3/lib/python3.7/site-packages/creme/`) and copy the file `creme/linear_model/pa.py` into the appropriate subdirectory in `L` 
+		|
+		|__ PanoSaliency/       --> Contains the procedures to convert the head movement data from quaternion format to coordinates in an equirectangular frame
+		|
+		|__ Prediction/         --> Contains the implementation of PARIMA
+		|
+		|__ Preprocess/         --> Codes to perform the one-time video preprocessing at the Server end. Check `PreProcess/README.md` for further details
+	
 
-- `video_preprocessing` contains codes for proprocessing the video content to obtain the object trajectories. 
-- `PanoSaliency` contains the procedure to convert the head movement data from quaternion format to coordinates in an equirectangular frame
-- `Prediction` contains the code to run our method of Viewport Prediction
-- `Baseline` contains the codes for some of the baselines that we have used in our paper
+## Requirements
+
+Use `python3` for all the codes. Install the dependencies by running `pip install -r requirements.txt`. 
+
+
