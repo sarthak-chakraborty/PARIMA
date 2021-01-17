@@ -12,6 +12,7 @@ import math
 import sys
 import pickle
 import json
+import argparse
 from parima import build_model
 from bitrate import alloc_bitrate
 from qoe import calc_qoe
@@ -20,9 +21,11 @@ from qoe import calc_qoe
 
 #Get viewport data
 def get_data(data, frame_nos, dataset, topic, usernum, fps, milisec, width, height, view_width, view_height):
+	VIEW_PATH = '../../Viewport/'
+	OBJ_PATH = '../../Obj_traj/'
 
-	obj_info = np.load('../../Obj_traj/ds{}/ds{}_topic{}.npy'.format(dataset, dataset, topic), allow_pickle=True,  encoding='latin1').item()
-	view_info = pickle.load(open('../../Viewport/ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
+	obj_info = np.load(OBJ_PATH + 'ds{}/ds{}_topic{}.npy'.format(dataset, dataset, topic), allow_pickle=True,  encoding='latin1').item()
+	view_info = pickle.load(open(VIEW_PATH + 'ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
 
 
 	n_objects = []
@@ -113,19 +116,47 @@ def get_data(data, frame_nos, dataset, topic, usernum, fps, milisec, width, heig
 	return data, frame_nos, max_frame,total_objects
 
 
+def calc_matrix_error(act_tiles, pred_tiles, ncol_tiles, nrow_tiles):
+	user_matrix_error = 0.
+
+	for fr in range(len(pred_tiles)):
+		act_tile = act_tiles[fr]
+		pred_tile = pred_tiles[fr]
+		act_prob = np.array([[0. for i in range(ncol_tiles)] for j in range(nrow_tiles)])
+		pred_prob = np.array([[0. for i in range(ncol_tiles)] for j in range(nrow_tiles)])
+		act_prob[act_tile[0] % nrow_tiles][act_tile[1] % ncol_tiles] = 1
+
+		x = nrow_tiles-1 if pred_tile[0] >= nrow_tiles else pred_tile[0]
+		x = 0 if x < 0 else x
+		y = ncol_tiles-1 if pred_tile[1] >= ncol_tiles else pred_tile[1] 
+		y = 0 if y < 0 else y
+		pred_prob[x][y] = 1
+
+		d=0.
+		for i in range(nrow_tiles):
+			for j in range(ncol_tiles):
+				d += np.square(pred_prob[i][j] - act_prob[i][j])
+		user_matrix_error += np.sqrt(d)
+
+	return user_matrix_error / len(pred_tiles)
+
 
 def main():
-	parser = argparse.ArgumentParser(description='Run PARIMA algorithm and calculate video for a single user')
+	parser = argparse.ArgumentParser(description='Run PARIMA algorithm and calculate Average QoE of a video for all users')
 
 	parser.add_argument('-D', '--dataset', type=int, required=True, help='Dataset ID (1 or 2)')
 	parser.add_argument('-T', '--topic', required=True, help='Topic in the particular Dataset (video name)')
 	parser.add_argument('--fps', type=int, required=True, help='fps of the video')
-	parser.add_argument('-O', '--offset', type=int, default=0, help='Offset for the video in seconds (when the data was logged in the dataset) [default: 0]')
-	parser.add_argument('-U', '--user', type=int, default=0, help='User ID on which the algorithm will be run [default: 0]')
-	parser.add_argument('--fpsfrac' type=float, default=1.0, help='Fraction with which fps is to be multiplied to change the chunk size [default: 1.0]')
+	parser.add_argument('-O', '--offset', type=int, default=0, help='Offset for the start of the video in seconds (when the data was logged in the dataset) [default: 0]')
+	parser.add_argument('--fpsfrac', type=float, default=1.0, help='Fraction with which fps is to be multiplied to change the chunk size [default: 1.0]')
 	parser.add_argument('-Q', '--quality', required=True, help='Preferred bitrate quality of the video (360p, 480p, 720p, 1080p, 1440p)')
 
 	args = parser.parse_args()
+
+	if args.dataset != 1 or args.dataset != 2:
+		print("Incorrect value of the Dataset ID provided!!...")
+		print("======= EXIT ===========")
+		exit()
 
 	pred_nframe = args.fps * args.fpsfrac
 
@@ -154,7 +185,6 @@ def main():
 		if usernum ==23: 
 			continue
 		print('User_{}'.format(usernum))
-		user_matrix_error = 0.
 
 		data, frame_nos = [],[]
 		# Get data
@@ -176,29 +206,9 @@ def main():
 				i += 1
 			else:
 				break
-
-		# Find matrix error
-		for fr in range(len(pred_tiles)):
-			act_tile = act_tiles[fr]
-			pred_tile = pred_tiles[fr]
-			act_prob = np.array([[0. for i in range(ncol_tiles)] for j in range(nrow_tiles)])
-			pred_prob = np.array([[0. for i in range(ncol_tiles)] for j in range(nrow_tiles)])
-			act_prob[act_tile[0]%nrow_tiles][act_tile[1]%ncol_tiles] = 1
-
-			x = nrow_tiles-1 if pred_tile[0] >= nrow_tiles else pred_tile[0]
-			x = 0 if x < 0 else x
-			y = ncol_tiles-1 if pred_tile[1] >= ncol_tiles else pred_tile[1] 
-			y = 0 if y < 0 else y
-			pred_prob[x][y] = 1
-
-			d=0.
-			for i in range(nrow_tiles):
-				for j in range(ncol_tiles):
-					d += np.square(pred_prob[i][j] - act_prob[i][j])
-			user_matrix_error += np.sqrt(d)
-
-		matrix_error.append(user_matrix_error/len(pred_tiles))
-
+	
+		mat_err = calc_matrix_error(act_tiles, pred_tiles, ncol_tiles, nrow_tiles)
+		matrix_error.append(mat_err)
 
 		frame_nos = frame_nos[i:]
 		# Allocate bitrates and calculate QoE
@@ -216,6 +226,7 @@ def main():
 	avg_y_mae = np.mean(list(zip(*y_mae)), axis=1)
 
 	#Print averaged results
+	print("\n======= RESULTS ============")
 	print('Dataset: {}'.format(args.dataset))
 	print('Topic: {}'.format(args.topic))
 	print('Pred nframe: {}'.format(args.fps * args.fpsfrac))

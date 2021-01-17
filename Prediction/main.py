@@ -15,9 +15,11 @@ from qoe import calc_qoe
 
 
 def get_data(data, frame_nos, dataset, topic, usernum, fps, milisec, width, height, view_width, view_height):
+	VIEW_PATH = '../../Viewport/'
+	OBJ_PATH = '../../Obj_traj/'
 
-	obj_info = np.load('../../Obj_traj/ds{}/ds{}_topic{}.npy'.format(dataset, dataset, topic), allow_pickle=True,  encoding='latin1').item()
-	view_info = pickle.load(open('../../Viewport/ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
+	obj_info = np.load(OBJ_PATH + 'ds{}/ds{}_topic{}.npy'.format(dataset, dataset, topic), allow_pickle=True,  encoding='latin1').item()
+	view_info = pickle.load(open(VIEW_PATH + 'ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
 
 
 	n_objects = []
@@ -111,17 +113,21 @@ def get_data(data, frame_nos, dataset, topic, usernum, fps, milisec, width, heig
 
 def main():
 
-	parser = argparse.ArgumentParser(description='Run PARIMA algorithm and calculate video for a single user')
+	parser = argparse.ArgumentParser(description='Run PARIMA algorithm and calculate QoE of a video for a single user')
 
 	parser.add_argument('-D', '--dataset', type=int, required=True, help='Dataset ID (1 or 2)')
 	parser.add_argument('-T', '--topic', required=True, help='Topic in the particular Dataset (video name)')
 	parser.add_argument('--fps', type=int, required=True, help='fps of the video')
-	parser.add_argument('-O', '--offset', type=int, default=0, help='Offset for the video in seconds (when the data was logged in the dataset) [default: 0]')
+	parser.add_argument('-O', '--offset', type=int, default=0, help='Offset for the start of the video in seconds (when the data was logged in the dataset) [default: 0]')
 	parser.add_argument('-U', '--user', type=int, default=0, help='User ID on which the algorithm will be run [default: 0]')
 	parser.add_argument('-Q', '--quality', required=True, help='Preferred bitrate quality of the video (360p, 480p, 720p, 1080p, 1440p)')
 
 	args = parser.parse_args()
 
+	if args.dataset != 1 or args.dataset != 2:
+		print("Incorrect value of the Dataset ID provided!!...")
+		print("======= EXIT ===========")
+		exit()
 
 	# Get the necessary information regarding the dimensions of the video
 	print("Reading JSON...")
@@ -166,6 +172,14 @@ def main():
 	qoe = calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames, width, height, nrow_tiles, ncol_tiles)
 
 	print(qoe)
+	#Print averaged results
+	print("\n======= RESULTS ============")
+	print('Dataset: {}'.format(args.dataset))
+	print('Topic: {}'.format(args.topic))
+	print('User ID: {}'.format(args.user))
+	print('QoE: {}'.format(qoe))
+
+	print('\n\n')
 
 if __name__ == '__main__':
 	main()
