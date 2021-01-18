@@ -21,8 +21,8 @@ from qoe import calc_qoe
 
 #Get viewport data
 def get_data(data, frame_nos, dataset, topic, usernum, fps, milisec, width, height, view_width, view_height):
-	VIEW_PATH = '../../Viewport/'
-	OBJ_PATH = '../../Obj_traj/'
+	VIEW_PATH = '../Viewport/'
+	OBJ_PATH = '../Obj_traj/'
 
 	obj_info = np.load(OBJ_PATH + 'ds{}/ds{}_topic{}.npy'.format(dataset, dataset, topic), allow_pickle=True,  encoding='latin1').item()
 	view_info = pickle.load(open(VIEW_PATH + 'ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')

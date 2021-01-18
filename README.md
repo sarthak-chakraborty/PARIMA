@@ -6,7 +6,7 @@ This is the official repository corresponding to the paper titled **"PARIMA: Vie
 
 ***Please cite our paper in any published work that uses any of these resources.***
 
-> Lovish Chopra, Sarthak Chakraborty, Abhijit Mondal, and Sandip Chakraborty. 2021. PARIMA: Viewport Adaptive 360-Degree Video Streaming. In *WWW '21: Proceedings of The Web Conference 2021*, April 19--23, 2021, Ljubljana
+> Lovish Chopra, Sarthak Chakraborty, Abhijit Mondal, and Sandip Chakraborty. 2021. PARIMA: Viewport Adaptive 360-Degree Video Streaming. In *WWW '21: Proceedings of The Web Conference 2021*, April 19-23, 2021, Ljubljana
 
 
 ## Abstract
@@ -39,7 +39,7 @@ With increasing advancements in technologies for capturing 360-degree videos, ad
 ## Requirements
 Use `python3` for all the codes. Install the dependencies by running `pip install -r requirements.txt`.  
 
-After the installation, source code for the package `creme` needs to be modified. For the same, go to the location(say, `L`) in your system where `creme` library source codes are stored(eg, `~/anaconda3/lib/python3.7/site-packages/creme/`) and copy the file `creme/linear_model/pa.py` into the appropriate subdirectory in `L`. 
+After the installation, source code for the package `creme` needs to be modified. For the same, go to the location(say, `PATH`) in your system where `creme` library source codes are stored(eg, `~/anaconda3/lib/python3.7/site-packages/creme/`) and copy the file `creme/linear_model/pa.py` into the appropriate subdirectory in `PATH`. 
 
 
 ## Datasets

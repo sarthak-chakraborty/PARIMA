@@ -8,6 +8,7 @@ def main():
 	parser.add_argument('--out', required=True, help='cubemap image height and width in pixels')
 	parser.add_argument('--dirPath', required=True, help='Path to directory of frames')
 	args=parser.parse_args()
+	
 	args.out=int(args.out)
 	args.out=int(args.out)
 	path, dirs, files = next(os.walk(args.dirPath))
@@ -19,7 +20,7 @@ def main():
 		os.mkdir(new_dir)
 
 	n_frames=file_count/7
-	print n_frames
+	print(n_frames)
 	for i in range(n_frames):
 		if not os.path.exists(new_dir+"/"+str(i)+".png"):
 			

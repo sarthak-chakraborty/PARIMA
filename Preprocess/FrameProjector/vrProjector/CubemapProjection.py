@@ -199,7 +199,7 @@ def findpart(self,x,y,width,height):
   		else:
   			return 3*width,height,'back'
 
-  def reprojectToEquirectangular(self, filepath,sourceProjection,width,height):
+  def reprojectToEquirectangular(self, filepath, sourceProjection, width, height):
 	f_in=open(filepath,"r")
 	f_out=open(filepath[:-4]+"-equirectangular.txt","w")
 	objects=f_in.readlines()
@@ -208,7 +208,7 @@ def findpart(self,x,y,width,height):
 	for x in objects:
 		y=x.split(" ")
 		frameno=y[0]
-		print frameno,
+		print(frameno),
 		objtype=y[2]
 		i=3
 		while 1:
@@ -237,9 +237,9 @@ def findpart(self,x,y,width,height):
 		sides.append(self.findpart(x2,y2,width,height))
 
 		f_out.write(frameno+" "+objtype+" ")
-		print sides
+		print(sides)
 		for s in sides: 
-			print s
+			print(s)
 
 			side=s[2]
 			x1=s[0]
@@ -272,7 +272,7 @@ def findpart(self,x,y,width,height):
 				x1eq,y1eq,_ = sourceProjection.pixel_value((theta, phi))
 
 			else:
-				print "ERROR"
+				print("ERROR")
 
 			f_out.write(str(x1eq)+" "+str(y1eq)+" ")
 

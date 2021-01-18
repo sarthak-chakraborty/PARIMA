@@ -88,6 +88,6 @@ def infer_image(net, layer_names, height, width, img, colors, labels, FLAGS,
         raise '[ERROR] Required variables are set to None before drawing boxes on images.'
         
     # Draw labels and boxes on the image
-    img = draw_labels_and_boxes(boxes, confidences, classids, idxs, labels,FLAGS.storefilename,FLAGS.framenum,FLAGS.position)
+    img = draw_labels_and_boxes(boxes, confidences, classids, idxs, labels, FLAGS.storefilename, FLAGS.framenum, FLAGS.position)
 
     return img, boxes, confidences, classids, idxs

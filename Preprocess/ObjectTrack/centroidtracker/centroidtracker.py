@@ -5,7 +5,7 @@ import numpy as np
 import math 
 
 class CentroidTracker():
-	def __init__(self, imsize,R,maxDisappeared=50):
+	def __init__(self, imsize,R, maxDisappeared=50):
 		# initialize the next unique object ID along with two ordered
 		# dictionaries used to keep track of mapping a given object
 		# ID to its centroid and number of consecutive frames it has
@@ -144,9 +144,7 @@ class CentroidTracker():
 			# centroids and input centroids, respectively -- our
 			# goal will be to match an input centroid to an existing
 			# object centroid
-			#print "(",np.array(objectCentroids),")","[",inputCentroids,"]"
 			D = self.distance_matrix(np.array(objectCentroids), inputCentroids)
-			#print "{",D,"}"
 			# in order to perform this matching we must (1) find the
 			# smallest value in each row and then (2) sort the row
 			# indexes based on their minimum values so that the row

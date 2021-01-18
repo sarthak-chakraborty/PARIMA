@@ -13,12 +13,12 @@ def main():
 	args = parser.parse_args()
 	
 
-	out = vrProjector2.CubemapProjection()
+	out = vrProjector.CubemapProjection()
 	out.initImages(int(args.cubeMapDim), int(args.cubeMapDim))
 
-	source = vrProjector2.EquirectangularProjection()
+	source = vrProjector.EquirectangularProjection()
 	source.loadImage(args.dirPath+"/frame0.jpg")
-	out.reprojectToEquirectangular(args.source,source,int(args.cubeMapDim),int(args.cubeMapDim))
+	out.reprojectToEquirectangular(args.source, source, int(args.cubeMapDim), int(args.cubeMapDim))
 
 if __name__ == "__main__":
     main()

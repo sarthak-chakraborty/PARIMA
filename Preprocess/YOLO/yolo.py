@@ -161,29 +161,3 @@ if __name__ == '__main__':
 			print ("[INFO] Cleaning up...")
 			writer.release()
 			vid.release()
-
-
-	else:
-		# Infer real-time on webcam
-		count = 0
-
-		vid = cv.VideoCapture(0)
-		while True:
-			_, frame = vid.read()
-			height, width = frame.shape[:2]
-
-			if count == 0:
-				frame, boxes, confidences, classids, idxs = infer_image(net, layer_names, \
-		    						height, width, frame, colors, labels, FLAGS)
-				count += 1
-			else:
-				frame, boxes, confidences, classids, idxs = infer_image(net, layer_names, \
-		    						height, width, frame, colors, labels, FLAGS, boxes, confidences, classids, idxs, infer=False)
-				count = (count + 1) % 6
-
-			cv.imshow('webcam', frame)
-
-			if cv.waitKey(1) & 0xFF == ord('q'):
-				break
-		vid.release()
-		cv.destroyAllWindows()

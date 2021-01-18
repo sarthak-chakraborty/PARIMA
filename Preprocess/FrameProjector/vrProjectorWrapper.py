@@ -10,6 +10,7 @@ def main():
 	parser.add_argument('--source', required=True, help='Source Video')
 	parser.add_argument('--out', required=True, help='output images width and height in pixels')
 	args = parser.parse_args()
+
 	if not os.path.exists(args.source[:-4]):
 		os.mkdir(args.source[:-4])
 	os.chdir(args.source[:-4])
@@ -31,13 +32,13 @@ def main():
 		if count == 60:
 			width =  image.shape[1]
 			height = image.shape[0]
-			print width,height
+			print("Width: {}, Height: {}".format(width, height))
 			if width > 2*height:
 				dim = (2*height,height)
 			else:
 				if width < 2*height:
 					dim = (width,width/2)
-		image = cv.resize(image,dim,interpolation = cv.INTER_AREA)
+		image = cv.resize(image,dim, interpolation = cv.INTER_AREA)
 
 		cv.imwrite("frame%d.jpg" % count, image)
 		source.loadImage("frame%d.jpg" % count)
