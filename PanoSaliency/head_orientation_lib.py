@@ -16,19 +16,8 @@ topic_info_dict = {'paris': ['paris.mp4', 244.06047, 3840, 2048], \
                    '6': ['cooking.mp4', 451.12, 2560, 1440], \
                    'diving': ['ocean40.webm', 372.23853, 3840, 2048], \
                    'roller': ['roller65.webm', 69.0, 3840, 2048], \
-                   '8': ['rhinos.mp4', 292.0584, 2560, 1440],\
-                   'coaster2_': ['', 60.0, -1, -1], \
-                   'coaster_': ['', 60.0, -1, -1], \
-                   'diving': ['', 60.0, -1, -1], \
-                   'drive': ['', 60.0, -1, -1], \
-                   'game': ['', 60.0, -1, -1], \
-                   'landscape': ['', 60.0, -1, -1], \
-                   'pacman': ['', 60.0, -1, -1],\
-                   'panel': ['', 60.0, -1, -1], \
-                   'ride': ['', 60.0, -1, -1], \
-                   'sport': ['', 60.0, -1, -1] }
+                   '8': ['rhinos.mp4', 292.0584, 2560, 1440] }
 
-#['coaster2_', 'coaster', 'diving', 'drive', 'game', 'landscape', 'pacman', 'panel', 'ride', 'sport']
 
 def extract_direction_dataset1(q):
         #q is quaternion
@@ -41,12 +30,7 @@ def extract_direction_dataset2(q):
         v0 = [0, 0, 1]
         q = Quaternion([q[3], -q[2], q[1], -q[0]])
         return q.rotate(v0)
-    
-def extract_direction_dataset3(q):
-        #q is quaternion
-        v0 = [0, 0, 1]
-        q = Quaternion([q[3], -q[2], q[1], -q[0]])
-        return q.rotate(v0)
+
 
 def pixel_to_ang(_x, _y, _geo_h, _geo_w):
     phi = geoy_to_phi(_x, _geo_h)
@@ -82,8 +66,8 @@ def vector_to_ang(_v):
     alpha = degree_distance(_v, [0, 1, 0])#degree between v and [0, 1, 0]
     phi = 90.0 - alpha
     proj1 = [0, np.cos(alpha/180.0 * np.pi), 0] #proj1 is the projection of v onto [0, 1, 0] axis
-    proj2 = _v - proj1#proj2 is the projection of v onto the plane([1, 0, 0], [0, 0, 1])
-    theta = degree_distance(proj2, [1, 0, 0])#theta = degree between project vector to plane and [1, 0, 0]
+    proj2 = _v - proj1  #proj2 is the projection of v onto the plane([1, 0, 0], [0, 0, 1])
+    theta = degree_distance(proj2, [1, 0, 0]) #theta = degree between project vector to plane and [1, 0, 0]
     sign = -1.0 if degree_distance(_v, [0, 0, -1]) > 90 else 1.0
     theta = sign * theta
     return theta, phi
@@ -98,12 +82,6 @@ def ang_to_geoxy(_theta, _phi, _h, _w):
     return x, y#wi, hi
 
 
-def adjust_pixel_dataset3(hi, wi, H, W):
-    wi = W - wi
-    wi = wi - W/4
-    if wi < 0: 
-        wi = wi + W
-    return hi, wi
 
 def adjust_pixel_dataset2(hi, wi, H, W):
     wi = W - wi
@@ -127,8 +105,6 @@ def adjust_pixellist_dataset(dataset, pixel_list, H, W):
             hi, wi = adjust_pixel_dataset1(hi, wi, H, W)
         elif dataset == 2:
             hi, wi = adjust_pixel_dataset2(hi, wi, H, W)
-        elif dataset == 3:
-            hi, wi = adjust_pixel_dataset3(hi, wi, H, W)
         rhi_list.append(hi)
         rwi_list.append(wi)
     return zip(rhi_list, rwi_list)

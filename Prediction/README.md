@@ -50,6 +50,9 @@ For predicting viewport of multiple users and calculate the average QoE, run `py
 	                        Preferred bitrate quality of the video (360p, 480p,
 	                        720p, 1080p, 1440p)
 
+The possible values for `dataset` and `topic`:  
+if `ds=1`, `topic` can be `paris`, `roller`, `venise`, `diving`, `timelapse`  
+if `ds=2`, `topic` can be `0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`  
 
 ## Additional Inputs
 Apart from the command line arguments, we will need to provide the path to the **Viewport Information** and the **Object Trajectory Information**.  
