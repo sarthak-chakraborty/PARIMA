@@ -1,14 +1,9 @@
 import numpy as np 
-import pandas as pd
 import math
-import sys
 import pickle
-import random
-import warnings
-import time
 
 
-def alloc_bitrate(pred_tiles, frame_nos, chunk_frames, pref_quality, nrow_tiles, ncol_tiles, pref_bitrate):
+def alloc_bitrate(pred_tiles, chunk_frames, nrow_tiles, ncol_tiles, pref_bitrate, player_tiles_x, player_tiles_y):
 	vid_bitrate = []
 
 	for i in range(len(chunk_frames)):
@@ -47,7 +42,10 @@ def alloc_bitrate(pred_tiles, frame_nos, chunk_frames, pref_quality, nrow_tiles,
 							op4 += abs(tile_1-k-ncol_tiles)
 
 						dist = min(op1, op2, op3, op4)
-						chunk_weight[j][k] += 1. - (1.0*dist)/((ncol_tiles+nrow_tiles)/2)
+						if(dist<=(player_tiles_x+player_tiles_y)/2):
+							chunk_weight[j][k] += 1. - (1.0*dist/2)/((ncol_tiles+nrow_tiles)/2)
+						else:
+							chunk_weight[j][k] += 1. - (1.0*dist)/((ncol_tiles+nrow_tiles)/2)
 
 		total_weight = sum(sum(x) for x in chunk_weight)
 

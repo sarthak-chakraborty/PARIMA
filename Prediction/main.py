@@ -1,11 +1,7 @@
 import numpy as np 
-import pandas as pd
 import math
-import sys
 import pickle
 import random
-import warnings
-import time
 import argparse
 import json
 from parima import build_model
@@ -143,6 +139,11 @@ def main():
 	pref_bitrate = jsonRead["bitrates"][args.quality]
 	ncol_tiles = jsonRead["ncol_tiles"]
 	nrow_tiles = jsonRead["nrow_tiles"]
+	player_width = jsonRead["player_width"]
+	player_height = jsonRead["player_height"]
+
+	player_tiles_x = math.ceil(player_width*ncol_tiles*1.0/width)
+	player_tiles_y = math.ceil(player_height*nrow_tiles*1.0/height)
 	
 	# Initialize variables
 	pred_nframe = args.fps
@@ -166,10 +167,10 @@ def main():
 
 	frame_nos = frame_nos[i:]
 	print("Allocate Bitrates...")
-	vid_bitrate = alloc_bitrate(pred_tiles, frame_nos, chunk_frames, args.quality, nrow_tiles, ncol_tiles, pref_bitrate)
+	vid_bitrate = alloc_bitrate(pred_tiles, chunk_frames, nrow_tiles, ncol_tiles, pref_bitrate, player_tiles_x, player_tiles_y)
 	
 	print("Calculate QoE...")
-	qoe = calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames, width, height, nrow_tiles, ncol_tiles)
+	qoe = calc_qoe(vid_bitrate, act_tiles, chunk_frames, width, height, nrow_tiles, ncol_tiles, player_width, player_height)
 
 	print(qoe)
 	#Print averaged results

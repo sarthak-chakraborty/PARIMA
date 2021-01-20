@@ -1,33 +1,13 @@
-# FIle to run to get QoE summarised results for Clust
+# File to run to get QoE summarised results for Clust
 import pickle
 import math
 import numpy as np
-import sys
-
-ds = int(sys.argv[1])
-topic = sys.argv[2]
-
-width_dict = {1: 3840, 2: 2560}
-height_dict = {1: 2048, 2: 1440}
-
-# ds 1
-width = width_dict[ds]
-height = height_dict[ds]
-nrow_tiles = 8
-ncol_tiles = 8
-
-bitrates = {'360p':1, '480p':2.5, '720p':5, '1080p':8, '1440p':16}	# [360p, 480p, 720p, 1080p, 1440p]
-player_width = 600
-player_height = 300
-pref_bitrate = bitrates['1080p']
-
-milisec = 1.0
-player_tiles_x = math.ceil(player_width*ncol_tiles*1.0/width)
-player_tiles_y = math.ceil(player_height*nrow_tiles*1.0/height)
+import argparse
+import json
 
 
 
-def min_manhattan(act, pred):
+def min_manhattan(act, pred, nrow_tiles, ncol_tiles):
 	"""
 	Get minimum manhattan distance
 	"""
@@ -38,7 +18,7 @@ def min_manhattan(act, pred):
 
 
 
-def alloc_bitrate(pred_tiles, frame_nos, chunk_frames, pref_quality):
+def alloc_bitrate(pred_tiles, frame_nos, chunk_frames, nrow_tiles, ncol_tiles, pref_bitrate, player_tiles_x, player_tiles_y):
 	"""
 	Allocate bitrate based on pyramid scheme
 	"""
@@ -93,13 +73,12 @@ def alloc_bitrate(pred_tiles, frame_nos, chunk_frames, pref_quality):
 
 
 # Calculate QoE of user
-def calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames):
+def calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames, width, height, nrow_tiles, ncol_tiles, player_width, player_height):
 	qoe = 0
 	prev_qoe_1 = 0
 	weight_1 = 1
 	weight_2 = 1
 	weight_3 = 1
-	tot1,tot2,tot3,tot4=0,0,0,0
 	
 	tile_width = width/ncol_tiles
 	tile_height = height/nrow_tiles
@@ -161,19 +140,50 @@ def calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames):
 
 		qoe += qoe_1 - weight_1*qoe_2 - weight_2*qoe_3 - weight_3*qoe_4
 		prev_qoe_1 = qoe_1
-		tot1+=qoe_1
-		tot2+=qoe_2
-		tot3+=qoe_3
-		tot4+=qoe_4
 
-	return qoe,tot1,tot2,tot3,tot4
+	return qoe
 
 
 
 def main():
+
+	parser = argparse.ArgumentParser(description='Find QoE of Clust Algorithm')
+
+	parser.add_argument('-D', '--dataset', type=int, required=True, help='Dataset ID (1 or 2)')
+	parser.add_argument('-T', '--topic', required=True, help='Topic in the particular Dataset (video name)')
+	parser.add_argument('--fps', type=int, required=True, help='fps of the video')
+	parser.add_argument('-Q', '--quality', required=True, help='Preferred bitrate quality of the video (360p, 480p, 720p, 1080p, 1440p)')
+
+	args = parser.parse_args()
+
+	if args.dataset != 1 or args.dataset != 2:
+		print("Incorrect value of the Dataset ID provided!!...")
+		print("======= EXIT ===========")
+		exit()
+
+	# Get the necessary information regarding the dimensions of the video
+	print("Reading JSON...")
+	file = open('./meta.json', )
+	jsonRead = json.load(file)
+
+	width = jsonRead["dataset"][args.dataset-1]["width"]
+	height = jsonRead["dataset"][args.dataset-1]["height"]
+	view_width = jsonRead["dataset"][args.dataset-1]["view_width"]
+	view_height = jsonRead["dataset"][args.dataset-1]["view_height"]
+	milisec = jsonRead["dataset"][args.dataset-1]["milisec"]
+
+	pref_bitrate = jsonRead["bitrates"][args.quality]
+	ncol_tiles = jsonRead["ncol_tiles"]
+	nrow_tiles = jsonRead["nrow_tiles"]
+	player_width = jsonRead["player_width"]
+	player_height = jsonRead["player_height"]
+
+	player_tiles_x = math.ceil(player_width*ncol_tiles*1.0/width)
+	player_tiles_y = math.ceil(player_height*nrow_tiles*1.0/height)
+
 	# Load actual and predicted viewports
-	act_viewport = pickle.load(open("viewportds" + str(ds) + "/act_viewport_ds"+ str(ds) + "_topic" + topic + "", "rb"))
-	pred_viewport = pickle.load(open("viewportds" + str(ds) + "/pred_viewport_ds"+ str(ds) + "_topic" + topic + "", "rb"))
+	act_viewport = pickle.load(open("./Viewport/ds" + str(args.dataset) + "/act_viewport_ds"+ str(args.dataset) + "_topic" + args.topic + "", "rb"))
+	pred_viewport = pickle.load(open("./Viewport/ds" + str(args.dataset) + "/pred_viewport_ds"+ str(args.dataset) + "_topic" + args.topic + "", "rb"))
 
 	pred_viewport_tile = pred_viewport.copy()
 	act_viewport_tile = act_viewport.copy()
@@ -190,12 +200,12 @@ def main():
 	for u in pred_viewport_tile.keys():
 		for i in range(len(pred_viewport_tile[u])):
 			for f in range(len(pred_viewport_tile[u][i])):
-				pred_viewport_tile[u][i][f] = (int(pred_viewport_tile[u][i][f][0]/width * 8)%8, int(pred_viewport_tile[u][i][f][1]/height * 8)%8)      # Convert viewport to tile
+				pred_viewport_tile[u][i][f] = (int(pred_viewport_tile[u][i][f][0]/width * nrow_tiles)%nrow_tiles, int(pred_viewport_tile[u][i][f][1]/height * ncol_tiles)%ncol_tiles)      # Convert viewport to tile
 
 	for u in act_viewport_tile.keys():
 		for i in range(len(act_viewport_tile[u])):
 			for f in range(len(act_viewport_tile[u][i])):
-				act_viewport_tile[u][i][f] = (int(act_viewport_tile[u][i][f][0]/width * 8)%8, int(act_viewport_tile[u][i][f][1]/height * 8)%8)          # Convert viewport to tile
+				act_viewport_tile[u][i][f] = (int(act_viewport_tile[u][i][f][0]/width * nrow_tiles)%nrow_tiles, int(act_viewport_tile[u][i][f][1]/height * ncol_tiles)%ncol_tiles)          # Convert viewport to tile
 
 
 	# Getting the lists into required format for alloc bitrate and qoe
@@ -233,12 +243,12 @@ def main():
 		count = 0
 		manhattan = 0
 		for i in range(len(pred_tiles)):
-			manhattan = manhattan + min_manhattan(act_tiles[i], pred_tiles[i])
+			manhattan = manhattan + min_manhattan(act_tiles[i], pred_tiles[i], nrow_tiles, ncol_tiles)
 			count = count + 1
 		total_manhattan = total_manhattan + manhattan*1.0/count
 
-		vid_bitrate = alloc_bitrate	(pred_viewport_tile[u], frame_nos, chunk_frames, '1080p')                  # Get qoe
-		qoe,qoe1,qoe2,qoe3,qoe4 = calc_qoe (vid_bitrate, act_viewport_tile[u], frame_nos, chunk_frames)
+		vid_bitrate = alloc_bitrate	(pred_viewport_tile[u], frame_nos, chunk_frames, nrow_tiles, ncol_tiles, pref_bitrate, player_tiles_x, player_tiles_y)                  # Get qoe
+		qoe = calc_qoe (vid_bitrate, act_viewport_tile[u], frame_nos, chunk_frames, width, height, nrow_tiles, ncol_tiles, player_width, player_height)
 		total_qoe = total_qoe + qoe
 		
 

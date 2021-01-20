@@ -1,15 +1,6 @@
-from creme import linear_model
-from creme import compose
-from creme import compat
-from creme import metrics
-from creme import model_selection
-from creme import optim
-from creme import preprocessing
-from creme import stream
 from sklearn import datasets
 import numpy as np 
 import math
-import sys
 import pickle
 import json
 import argparse
@@ -175,15 +166,17 @@ def main():
 	pref_bitrate = jsonRead["bitrates"][args.quality]
 	ncol_tiles = jsonRead["ncol_tiles"]
 	nrow_tiles = jsonRead["nrow_tiles"]
+	player_width = jsonRead["player_width"]
+	player_height = jsonRead["player_height"]
 
+	player_tiles_x = math.ceil(player_width*ncol_tiles*1.0/width)
+	player_tiles_y = math.ceil(player_height*nrow_tiles*1.0/height)
 
 	manhattan_error, x_mae, y_mae, qoe = [],[],[],[]
 	matrix_error = []
 
 	# Run for all users
 	for usernum in range(nusers):
-		if usernum ==23: 
-			continue
 		print('User_{}'.format(usernum))
 
 		data, frame_nos = [],[]
@@ -212,10 +205,10 @@ def main():
 
 		frame_nos = frame_nos[i:]
 		# Allocate bitrates and calculate QoE
-		vid_bitrate = alloc_bitrate(pred_tiles, frame_nos, chunk_frames, args.quality, nrow_tiles, ncol_tiles, pref_bitrate)
-		q = calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames, width, height, nrow_tiles, ncol_tiles)
+		vid_bitrate = alloc_bitrate(pred_tiles, chunk_frames, nrow_tiles, ncol_tiles, pref_bitrate, player_tiles_x, player_tiles_y)
+		q = calc_qoe(vid_bitrate, act_tiles, chunk_frames, width, height, nrow_tiles, ncol_tiles, player_width, player_height)
 		qoe.append(q)
-		print(q, err[-1])
+		print("QoE: {}".format(q))
 
 
 	#Find averaged results
@@ -227,6 +220,7 @@ def main():
 
 	#Print averaged results
 	print("\n======= RESULTS ============")
+	print('PARIMA')
 	print('Dataset: {}'.format(args.dataset))
 	print('Topic: {}'.format(args.topic))
 	print('Pred nframe: {}'.format(args.fps * args.fpsfrac))

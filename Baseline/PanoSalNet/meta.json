@@ -24,8 +24,8 @@
 			"1080p" : 8,
 			"1440p" : 16
 	},
-	"ncol_tiles" : 8,
-	"nrow_tiles" : 8,
+	"ncol_tiles" : 16,
+	"nrow_tiles" : 9,
 	"player_width" : 600,
 	"player_height" : 300
 }

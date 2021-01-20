@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 
-def calc_qoe(vid_bitrate, act_tiles, chunk_frames, width, height, nrow_tiles, ncol_tiles, player_width, player_height):
+def calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames, width, height, nrow_tiles, ncol_tiles, player_width, player_height):
 	qoe = 0
 	prev_qoe_1 = 0
 	weight_1 = 1
@@ -21,7 +21,7 @@ def calc_qoe(vid_bitrate, act_tiles, chunk_frames, width, height, nrow_tiles, nc
 
 		chunk = chunk_frames[i]
 		chunk_bitrate = vid_bitrate[i]
-		chunk_act = act_tiles[chunk[0]-chunk_frames[0][0] : chunk[-1]-chunk_frames[0][0]]
+		chunk_act = act_tiles[i]
 
 		for j in range(len(chunk_act)):
 			if(chunk_act[j][0] not in rows or chunk_act[j][1] not in cols):

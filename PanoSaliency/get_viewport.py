@@ -2,7 +2,6 @@ import os
 import numpy as np
 import pickle
 import header
-import sys
 import argparse
 
 import head_orientation_lib

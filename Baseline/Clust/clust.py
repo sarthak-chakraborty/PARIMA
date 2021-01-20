@@ -8,10 +8,10 @@ import numpy.matlib as npm
 from Quaternion import Quat
 import pickle
 import Quaternion
+import argparse
 
 import head_orientation_lib
 import saldat_head_orientation
-import saldat_saliency
 
 
 
@@ -63,21 +63,37 @@ def interpolate(mean):
 if __name__ == "__main__":
 
 	#specify dataset & video name to extract
-	dataset = int(sys.argv[1])
-	topic = sys.argv[2]
-	fps = int(sys.argv[3])
+	parser = argparse.ArgumentParser(description='Run Viewport Extraction Algorithm')
 
+	parser.add_argument('-D', '--dataset', type=int, required=True, help='Dataset ID (1 or 2)')
+	parser.add_argument('-T', '--topic', required=True, help='Topic in the particular Dataset (video name)')
+	parser.add_argument('--fps', type=int, required=True, help='fps of the video')
+	
+	args = parser.parse_args()
+
+	dataset = args.dataset
+	topic = args.topic 	#dataset 1: paris, roller, venise,diving,timelapse, 
+				   		#dataset 2: '0', '1', '2', '3', '4', '5', '6', '7', '8'
+	fps = args.fps
 	pred_window = fps
 
+	if args.dataset != 1 or args.dataset != 2:
+		print("Incorrect value of the Dataset ID provided!!...")
+		print("======= EXIT ===========")
+		exit()
 
-	print ("generating saliency maps for ds={}, topic={}".format(dataset, topic))
-	dirpath1 = header.dirpath1  #u'./data/head-orientation/dataset1'
-	dirpath2 = header.dirpath2  #u'./data/head-orientation/dataset2/Experiment_1'
-	dirpath3 = header.dirpath3  #u'./data/head-orientation/dataset3/sensory/orientation'
+	PATH = './Viewport/ds{}/'.format(dataset)
+	if not os.path.exists(PATH):
+		os.mkdir(PATH)
+	
+	#initialize head_orentiation
+	print ("Extract Viewport for ds={}, topic={}".format(dataset, topic))
+	dirpath1 = header.dirpath1	#u'./data/head-orientation/dataset1'
+	dirpath2 = header.dirpath2	#u'./data/head-orientation/dataset2/Experiment_1'
 	ext1 = header.ext1
 	ext2 = header.ext2
-	ext3 = header.ext3
-	headoren = saldat_head_orientation.HeadOrientation(dirpath1, dirpath2, dirpath3, ext1, ext2, ext3)
+
+	headoren = saldat_head_orientation.HeadOrientation(dirpath1, dirpath2, ext1, ext2)
 	
 
 	dirpath, filename_list, f_parse, f_extract_direction = headoren.load_filename_list(dataset, topic)
@@ -145,7 +161,6 @@ if __name__ == "__main__":
 		print(np.array(series_ds).shape)
 
 	pickle.dump(series_ds, open("series_ds_{}.pkl".format(topic), 'wb'))
-
 
 
 
@@ -359,7 +374,7 @@ if __name__ == "__main__":
 			break
 	
 	
-	pickle.dump(act_viewport_dict, open('./data/ds{}/act_viewport_ds{}_topic{}'.format(dataset, dataset, topic), 'wb'))
-	pickle.dump(pred_viewport_dict, open('./data/ds{}/pred_viewport_ds{}_topic{}'.format(dataset, dataset, topic), 'wb'))
+	pickle.dump(act_viewport_dict, open(PATH + 'act_viewport_ds{}_topic{}'.format(dataset, topic), 'wb'))
+	pickle.dump(pred_viewport_dict, open(PATH + 'pred_viewport_ds{}_topic{}'.format(dataset, topic), 'wb'))
 			
 

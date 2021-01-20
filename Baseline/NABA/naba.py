@@ -1,47 +1,15 @@
-from sklearn import datasets
 import numpy as np 
 import math
-import sys
 import pickle
 
-dataset = int(sys.argv[1])
-topic = sys.argv[2]
-fps=int(sys.argv[3])
-offset=int(sys.argv[4])	
-pref_quality = sys.argv[5]
-fps_fraction = float(sys.argv[6])	# determines the prediction window, fraction k will lead to a prediction window of fps*k
 
-usernum=1
-ncol_tiles=8
-nrow_tiles=8
-pred_nframe=int(fps*fps_fraction)
-bitrates = {'360p':1, '480p':2.5, '720p':5, '1080p':8, '1440p':16}	# [360p, 480p, 720p, 1080p, 1440p]
-player_width = 600
-player_height = 300
-pref_bitrate = bitrates[pref_quality]
+def get_data(data, frame_nos, dataset, topic, usernum, fps, milisec, width, height, view_width, view_height):
+	"""
+	Read and return the viewport data
+	"""
+	VIEW_PATH = '../../Viewport/'
 
-
-# # ds 1
-# width=3840.0
-# height=1920.0
-# view_width = 3840.0
-# view_height = 2048.0
-# milisec = 1.0
-
-# ds 2
-width=2560.0
-height=1280.0
-view_width = 2560.0
-view_height = 1440.0
-milisec = 1.0
-
-player_tiles_x = math.ceil(player_width*ncol_tiles*1.0/width)
-player_tiles_y = math.ceil(player_height*nrow_tiles*1.0/height)
-
-
-def get_data(data, frame_nos, dataset, topic, usernum):
-
-	view_info = pickle.load(open('../../Viewport/ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
+	view_info = pickle.load(open(VIEW_PATH + 'ds{}/viewport_ds{}_topic{}_user{}'.format(dataset, dataset, topic, usernum), 'rb'), encoding='latin1')
 
 	if dataset == 1:
 		max_frame = int(view_info[-1][0]*1.0*fps/milisec)
@@ -90,7 +58,7 @@ def get_data(data, frame_nos, dataset, topic, usernum):
 	return data, frame_nos, max_frame
 
 
-def tiling(data, frame_nos, max_frame):
+def tiling(data, frame_nos, max_frame, width, height, nrow_tiles, ncol_tiles, fps, pred_nframe):
 	"""
 	Calculate the tiles corresponding to the viewport and segment them into different chunks
 	"""
@@ -101,7 +69,7 @@ def tiling(data, frame_nos, max_frame):
 
 	# Leaving the first 5 seconds ( to keep consistent with our model)
 	while True:
-		curr_frame=frame_nos[i]
+		curr_frame = frame_nos[i]
 		if curr_frame<5*fps:
 			i=i+1
 			[inp_i,x,y]=data[curr_frame]
@@ -154,7 +122,7 @@ def tiling(data, frame_nos, max_frame):
 
 
 
-def alloc_bitrate(frame_nos, chunk_frames, pref_quality):
+def alloc_bitrate(frame_nos, chunk_frames, pref_bitrate, nrow_tiles, ncol_tiles):
 	"""
 	Allocates equal bitrate to all the tiles
 	"""
@@ -177,14 +145,15 @@ def alloc_bitrate(frame_nos, chunk_frames, pref_quality):
 
 
 
-def calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames):
-	print("####")
+def calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames, width, height, nrow_tiles, ncol_tiles, player_width, player_height):
+	"""
+	Calculate QoE based on the video bitrates
+	"""
 	qoe = 0
 	prev_qoe_1 = 0
 	weight_1 = 1
 	weight_2 = 1
 	weight_3 = 1
-	tot1,tot2,tot3,tot4 = 0,0,0,0
 	
 	tile_width = width/ncol_tiles
 	tile_height = height/nrow_tiles
@@ -247,35 +216,6 @@ def calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames):
 
 		qoe += qoe_1 - weight_1*qoe_2 - weight_2*qoe_3 - weight_3*qoe_4
 		prev_qoe_1 = qoe_1
-		tot1 += qoe_1
-		tot2 += qoe_2
-		tot3 += qoe_3
-		tot4 += qoe_4
 
-	return qoe,tot1,tot2,tot3,tot4
+	return qoe
 
-
-
-def main():
-	data, frame_nos = [],[]
-	data, frame_nos, max_frame = get_data(data, frame_nos, dataset, topic, usernum)
-
-	act_tiles, chunk_frames = tiling(data, frame_nos, max_frame)
-
-	# To be consistent with our model
-	i = 0
-	while True:
-		curr_frame=frame_nos[i]
-		if curr_frame<5*fps:
-			i += 1
-		else:
-			break
-
-	frame_nos = frame_nos[i:]
-	vid_bitrate = alloc_bitrate(frame_nos, chunk_frames, pref_quality)
-	qoe,_,_,_,_ = calc_qoe(vid_bitrate, act_tiles, frame_nos, chunk_frames)
-
-	print(qoe)
-
-if __name__ == '__main__':
-	main()
