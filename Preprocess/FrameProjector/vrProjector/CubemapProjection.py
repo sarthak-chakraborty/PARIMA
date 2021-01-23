@@ -210,7 +210,7 @@ class CubemapProjection(AbstractProjection):
 			frameno=y[0]
 			print(frameno),
 			objtype=y[2]
-			i=3
+			i=2
 			while 1:
 				try:
 					x1=int(y[i])

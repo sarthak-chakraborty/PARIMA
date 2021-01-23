@@ -9,7 +9,7 @@ def show_image(img):
     cv.imshow("Image", img)
     cv.waitKey(0)
 
-def draw_labels_and_boxes(boxes, confidences, classids, idxs, labels,filename,framenum,position):
+def draw_labels_and_boxes(boxes, confidences, classids, idxs, labels,filename,framenum):
     # If there are any detections
     f=open(filename,"a+")
     if len(idxs) > 0:
@@ -19,7 +19,7 @@ def draw_labels_and_boxes(boxes, confidences, classids, idxs, labels,filename,fr
             x, y = boxes[i][0], boxes[i][1]
             w, h = boxes[i][2], boxes[i][3]
 
-            f.write(str(framenum)+" "+position+" "+labels[classids[i]]+" "+str(x)+" "+str(y)+" "+str(x+w)+" "+str(y+h)+" "+str(confidences[i])+"\n")
+            f.write(str(framenum)+" "+labels[classids[i]]+" "+str(x)+" "+str(y)+" "+str(x+w)+" "+str(y+h)+" "+str(confidences[i])+"\n")
 
     f.close()
 
@@ -88,6 +88,6 @@ def infer_image(net, layer_names, height, width, img, colors, labels, FLAGS,
         raise '[ERROR] Required variables are set to None before drawing boxes on images.'
         
     # Draw labels and boxes on the image
-    img = draw_labels_and_boxes(boxes, confidences, classids, idxs, labels, FLAGS.storefilename, FLAGS.framenum, FLAGS.position)
+    img = draw_labels_and_boxes(boxes, confidences, classids, idxs, labels, FLAGS.storefilename, FLAGS.framenum)
 
     return img, boxes, confidences, classids, idxs

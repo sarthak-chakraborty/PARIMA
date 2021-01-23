@@ -14,6 +14,5 @@ file_count = len(files)
 for i in range(file_count):
 	filename = str(i) + ".png"
 	print(i)
-	position = "."
-	os.system("python yolo.py --image-path=" + args.source + "/" + filename + " --storefilename " + args.output + " --framenum " + str(i) + " --position " + position)
+	os.system("python yolo.py --image-path=" + args.source + "/" + filename + " --storefilename " + args.output + " --framenum " + str(i))
 

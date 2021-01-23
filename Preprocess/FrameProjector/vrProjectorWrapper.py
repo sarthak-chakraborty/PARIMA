@@ -23,27 +23,26 @@ def main():
 	video = cv.VideoCapture("../"+args.source)
 	source = vrProjector.EquirectangularProjection()
 
-	for i in range(2640):
-		success,image = video.read()
-	count = 60
+	success,image = video.read()
+	count = 0
 	dim=(0,0)
 
 	while success:
-		if count == 60:
+		if count == 0:
 			width =  image.shape[1]
 			height = image.shape[0]
 			print("Width: {}, Height: {}".format(width, height))
-			if width > 2*height:
-				dim = (2*height,height)
+			if width > 2 * height:
+				dim = (2 * height, height)
 			else:
-				if width < 2*height:
-					dim = (width,width/2)
+				if width < 2 * height:
+					dim = (width, width / 2)
 		image = cv.resize(image,dim, interpolation = cv.INTER_AREA)
 
 		cv.imwrite("frame%d.jpg" % count, image)
 		source.loadImage("frame%d.jpg" % count)
 		out.reprojectToThis(source)
-		out.saveImages("%d_front.png"%count, "%d_right.png"%count, "%d_back.png"%count, "%d_left.png"%count, "%d_top.png"%count, "%d_bottom.png"%count)
+		out.saveImages("%d_front.png" % count, "%d_right.png" % count, "%d_back.png" % count, "%d_left.png" % count, "%d_top.png" % count, "%d_bottom.png" % count)
 		success,image = video.read()
 		count += 1
 

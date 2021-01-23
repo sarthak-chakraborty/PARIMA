@@ -22,11 +22,6 @@ if __name__ == '__main__':
 		default='0',
 		help='Frame number')
 
-	parser.add_argument('-pos', '--position',
-		type=str,
-		default='front',
-		help='Front/Back/Left/Right/Top/Bottom')
-
 	parser.add_argument('-w', '--weights',
 		type=str,
 		default='./yolov3-coco/yolov3.weights',
