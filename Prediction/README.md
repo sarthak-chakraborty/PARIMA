@@ -67,8 +67,4 @@ Paths to the same are defined in the `get_data()` function in the variables `VIE
 	- qoe.py           : Calculates the QoE of a video based on the allocated bitrate and the actual viewport
 	- main.py          : Main function to run Single User Execution
 	- obs_parima.py    : Main function to run Multiple User Execution
-	- contribution.py  : calculates the contribution(as percentage) of the objects and the previous viewport in predicting the next viewport
-
-
-## Object Contribution
 
