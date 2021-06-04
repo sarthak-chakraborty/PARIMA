@@ -77,14 +77,14 @@ if __name__ == "__main__":
 	fps = args.fps
 	pred_window = fps
 
-	if args.dataset != 1 or args.dataset != 2:
+	if args.dataset != 1 and args.dataset != 2:
 		print("Incorrect value of the Dataset ID provided!!...")
 		print("======= EXIT ===========")
 		exit()
 
 	PATH = './Viewport/ds{}/'.format(dataset)
 	if not os.path.exists(PATH):
-		os.mkdir(PATH)
+		os.makedirs(PATH)
 	
 	#initialize head_orentiation
 	print ("Extract Viewport for ds={}, topic={}".format(dataset, topic))

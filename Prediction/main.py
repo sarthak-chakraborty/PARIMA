@@ -120,7 +120,7 @@ def main():
 
 	args = parser.parse_args()
 
-	if args.dataset != 1 or args.dataset != 2:
+	if args.dataset != 1 and args.dataset != 2:
 		print("Incorrect value of the Dataset ID provided!!...")
 		print("======= EXIT ===========")
 		exit()
