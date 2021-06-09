@@ -1,5 +1,3 @@
-[![HitCount](http://hits.dwyl.com/sarthak-chakraborty/PARIMA.svg)](http://hits.dwyl.com/sarthak-chakraborty/PARIMA)
-
 # PARIMA: Viewport Adaptive 360-Degree Video Streaming
 
 This is the official repository corresponding to the paper titled **"PARIMA: Viewport Adaptive 360-Degree Video Streaming"** (![link](https://dl.acm.org/doi/10.1145/3442381.3450070)) accepted at the Proeedings of the 30th Web Conference 2021 (WWW '21), Ljubljana, Slovenia.
