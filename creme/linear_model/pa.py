@@ -91,8 +91,8 @@ class PARegressor(BasePA, base.Regressor):
     def fit_one(self, X, x, y):
 
         x_pred, y_pred = self.predict_one(X, False, -1, -1)
-        tau_x = self.calc_tau(X, self.loss.eval(x, x_pred))
-        tau_y = self.calc_tau(X, self.loss.eval(y, y_pred))
+        tau_x = self.calc_tau(X, self.loss(x, x_pred))
+        tau_y = self.calc_tau(X, self.loss(y, y_pred))
         step_x = tau_x * np.sign(x - x_pred)
         step_y = tau_y * np.sign(y - y_pred)
        	
@@ -112,14 +112,14 @@ class PARegressor(BasePA, base.Regressor):
         for k in frames:
             [X, x, y] = self.data[k]
             x_pred, y_pred = self.predict_one(X, False, -1, -1)
-            tau_x = self.calc_tau(X, self.loss.eval(x, x_pred))
-            tau_y = self.calc_tau(X, self.loss.eval(y, y_pred))
+            tau_x = self.calc_tau(X, self.loss(x, x_pred))
+            tau_y = self.calc_tau(X, self.loss(y, y_pred))
             step_x = self.learning_rate * tau_x * np.sign(x - x_pred)
             step_y = self.learning_rate * tau_y * np.sign(y - y_pred)
         
             # x_pred, y_pred = self.predict_one(X)
-            # loss_x = self.loss.eval(x, x_pred)
-            # loss_y = self.loss.eval(y, y_pred)
+            # loss_x = self.loss(x, x_pred)
+            # loss_y = self.loss(y, y_pred)
             # sign_x = np.sign(x - x_pred)
             # sign_y = np.sign(y - y_pred)
         
@@ -202,7 +202,7 @@ class PAClassifier(BasePA, base.BinaryClassifier):
     def fit_one(self, x, y):
 
         y_pred = utils.math.dot(x, self.weights) + self.intercept
-        tau = self.calc_tau(x, self.loss.eval(y, y_pred))
+        tau = self.calc_tau(x, self.loss(y, y_pred))
         step = tau * (y or -1)  # y == False becomes -1
 
         for i, xi in x.items():
