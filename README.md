@@ -55,6 +55,8 @@ Use `python3` for all the codes. Install the dependencies by running `pip instal
 
 After the installation, source code for the package `creme` needs to be modified. For the same, go to the location(say, `PATH`) in your system where `creme` library source codes are stored(eg, `~/anaconda3/lib/python3.7/site-packages/creme/`) and copy the file `creme/linear_model/pa.py` into the appropriate subdirectory in `PATH`. 
 
+**Note:** `creme` has now merged with `scikit-multiflow` to yield a new library ![`river`](https://github.com/online-ml/river). Appropriate changes will be needed in the code to make this code compatible.
+
 
 ## Datasets
 In our experiments, we have particularly used two popular datasets containing several 360-degree videos of different categories along with head tracking log. 
