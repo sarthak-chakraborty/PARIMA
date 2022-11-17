@@ -4,7 +4,8 @@ This is the official repository corresponding to the paper titled **"PARIMA: Vie
 
 ***Please cite our paper in any published work that uses any of these resources.***
 
-> @inproceedings{10.1145/3442381.3450070,  
+```latex
+@inproceedings{10.1145/3442381.3450070,  
 author = {Chopra, Lovish and Chakraborty, Sarthak and Mondal, Abhijit and Chakraborty, Sandip},  
 title = {PARIMA: Viewport Adaptive 360-Degree Video Streaming},  
 year = {2021},  
@@ -21,6 +22,7 @@ keywords = {360° Video Streaming, Online Learning, Adaptive Streaming},
 location = {Ljubljana, Slovenia},  
 series = {WWW '21}  
 }
+```
 
 
 ## Abstract
